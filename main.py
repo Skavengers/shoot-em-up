@@ -5,6 +5,7 @@ BLACK = (0,)*3
 
 class Ship:
     def __init__(self, link_sprite, health=10, lvl=0):
+        self.time_laser = 0
         self.lvl = lvl
         self.health = health
         self.sprite = pg.image.load(link_sprite).convert_alpha()
@@ -50,7 +51,7 @@ class Ship:
                     compteur += 1
     def uselaser(self):
         self.time_laser = 6
-    def laser(self,time_run = 0):
+    def laser(self):
         laser_animation = [pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\laser\laser.png").convert_alpha(),
                            pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\laser\laser1.png").convert_alpha(),
                            pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\laser\laser2A.png").convert_alpha(),
@@ -60,10 +61,13 @@ class Ship:
                            pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\laser\laser5.png").convert_alpha(),
                            pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\laser\laser7.png").convert_alpha(),
                            pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\laser\laser8.png").convert_alpha()]
-        int_time_run = int(time_run)
-        die_animation = laser_animation[int_time_run]
-        screen.blit(die_animation, (self.rect.x + 2, self.rect.y-(HEIGTH + self.sprite.get_height())))
-        return time_run-1/60
+        int_time_run = int(self.time_laser)
+        try:
+            die_animation = laser_animation[int_time_run]
+            screen.blit(die_animation, (self.rect.x + 2, self.rect.y - HEIGTH - self.sprite.get_height()))
+            self.time_laser -= 1 / 30
+        except:
+            pass
 
     def keys(self,count,rectyeux):
         keys = pg.key.get_pressed()
@@ -84,7 +88,7 @@ class Ship:
         if keys[pg.K_b] and count % (FPS/4) == 0 :
             self.pos_shoot.append([self.rect.x,self.rect.y])
         if keys[pg.K_a]and count % (FPS/4) == 0:
-            self.laser()
+            self.uselaser()
 
 
 
