@@ -1,23 +1,27 @@
 import pygame as pg
 from settings import *
-BLACK = (0,)*3
 
 
 class Ship:
-    def __init__(self, link_sprite, health=10, lvl=0):
+    def __init__(self, link_sprite, health=10, lvl=0, power=3):
         self.time_laser = 0
         self.lvl = lvl
         self.health = health
+        self.power = power
         self.sprite = pg.image.load(link_sprite).convert_alpha()
         self.true_sprite = pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\truesprite.png").convert_alpha()
         self.true_rect = self.true_sprite.get_rect(topleft=[108, 113])
+        self.true_sprite.set_colorkey(WHITE)
+        self.sprite.set_colorkey(WHITE)
         self.rect = self.sprite.get_rect(topleft=[100, 100])
         self.pos_shoot = []
     def draw(self,rectyeux):
         red = (255,0,0)
         font = pg.font.SysFont("earthorbiter.ttf", 70)
         show_health = font.render(str(self.health), True, red)
+        show_power = font.render("Power: "+str(self.power),True, BLACK)
         screen.blit(show_health, (20, 20))
+        screen.blit(show_power,(900,20))
         if self.rect.colliderect(rectyeux):
             screen.blit(self.true_sprite, self.true_rect)
         else:
@@ -40,6 +44,7 @@ class Ship:
             value += 1
     def bullet(self):
         sprite_bullet = pg.image.load(r'C:\Users\franc\PycharmProjects\shoot\Assets\shoot.png').convert_alpha()
+        sprite_bullet.set_colorkey(WHITE)
         compteur = 0
         for i in range(len(self.pos_shoot)):
             i -= compteur
@@ -51,6 +56,7 @@ class Ship:
                     compteur += 1
     def uselaser(self):
         self.time_laser = 6
+        self.power -=1
     def laser(self):
         laser_animation = [pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\laser\laser.png").convert_alpha(),
                            pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\laser\laser1.png").convert_alpha(),
@@ -64,10 +70,12 @@ class Ship:
         int_time_run = int(self.time_laser)
         try:
             die_animation = laser_animation[int_time_run]
-            screen.blit(die_animation, (self.rect.x + 2, self.rect.y - HEIGTH - self.sprite.get_height()))
+            die_animation.set_colorkey(WHITE)
+            screen.blit(die_animation, (self.rect.x + 2, self.rect.y - HEIGTH - self.sprite.get_height()-20))
             self.time_laser -= 1 / 30
+            return True
         except:
-            pass
+            return False
 
     def keys(self,count,rectyeux):
         keys = pg.key.get_pressed()
@@ -87,7 +95,7 @@ class Ship:
             self.true_rect.bottom += SPEED
         if keys[pg.K_b] and count % (FPS/4) == 0 :
             self.pos_shoot.append([self.rect.x,self.rect.y])
-        if keys[pg.K_a]and count % (FPS/4) == 0:
+        if keys[pg.K_a] and not self.laser() and self.power != 0:
             self.uselaser()
 
 
@@ -96,22 +104,29 @@ class Ship:
 
 
 def run():
+    global SPEED
     font = pg.font.SysFont("earthorbiter.ttf", 70)
     pg.display.set_caption('to the moon')
     icon = pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\pycon.png").convert()
+    background = pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\background.jpg").convert()
     monster1 = pg.image.load(r'C:\Users\franc\PycharmProjects\shoot\Assets\yeux.jpg').convert()
+    monster1.set_colorkey(WHITE)
     pg.display.set_icon(icon)
-    rectyeux = monster1.get_rect(topleft = [200, 200])
+    rectyeux = monster1.get_rect(topleft=[200, 200])
     ship = Ship(r'C:\Users\franc\PycharmProjects\shoot\Assets\char1.png',10)
     count = 0
     while True:
-        screen.fill('blue')
+        screen.blit(background, (0, 0))
         count += 1
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 pg.quit()
         ship.keys(count, rectyeux)
-        ship.laser()
+        islaseractivate = ship.laser()
+        if islaseractivate:
+            SPEED = 1
+        else:
+            SPEED = 5
         ship.bullet()
         if ship.health == 0:
             ship.die()
@@ -122,8 +137,6 @@ def run():
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     pg.quit()"""
-
-
 
         screen.blit(monster1,rectyeux)
         ship.draw(rectyeux)
