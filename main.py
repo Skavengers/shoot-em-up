@@ -1,6 +1,6 @@
 import pygame as pg
 from settings import *
-
+from levelup import *
 
 class Ship:
     def __init__(self, link_sprite, health=10, lvl=0, power=3):
@@ -93,11 +93,30 @@ class Ship:
         if keys[pg.K_DOWN] and self.rect.y<HEIGTH-SIZE_h :
             self.rect.bottom += SPEED
             self.true_rect.bottom += SPEED
-        if keys[pg.K_b] and count % (FPS/4) == 0 :
-            self.pos_shoot.append([self.rect.x,self.rect.y])
+        if keys[pg.K_b] and count % (FPS/4) == 0 and not self.laser():
+            self.pos_shoot.append([self.rect.x, self.rect.y])
         if keys[pg.K_a] and not self.laser() and self.power != 0:
             self.uselaser()
 
+class Object:
+    def __init__(self, name, str_carac, img):
+        self.card_background = ""
+        self.name = name
+        self.str_carac = str_carac
+        self.img = pg.image.load(img).convert()
+        self.font = pg.font.SysFont("essential.ttf", 50)
+    def draw(self):
+        text_name = self.font.render(self.name, True, GREY)
+        text_carac = self.font.render(self.str_carac, True, GREY)
+        screen.blit(text_name,(500,50))
+        screen.blit(self.img,(300,100))
+        screen.blit(text_carac,(500,800))
+
+
+def lvlup():
+    list_object = [["stong steel","give +1 health ","C:/Users/franc/PycharmProjects/shoot/Assets/objects/strong steel.png"],[""]]
+    ob = Object(list_object[0][0],list_object[0][1],list_object[0][2])
+    ob.draw()
 
 
 
@@ -121,6 +140,8 @@ def run():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 pg.quit()
+        """lvlup()"""
+
         ship.keys(count, rectyeux)
         islaseractivate = ship.laser()
         if islaseractivate:
@@ -130,19 +151,12 @@ def run():
         ship.bullet()
         if ship.health == 0:
             ship.die()
-        """img = font.render('You Die ', True, BLACK)
-        while True:
-            screen.blit(img, (20, 20))
-            pg.display.flip()
-            for event in pg.event.get():
-                if event.type == pg.QUIT:
-                    pg.quit()"""
 
         screen.blit(monster1,rectyeux)
         ship.draw(rectyeux)
         pg.display.flip()
-        """pg.display.update()"""
         clock.tick(FPS)
+
 
 if __name__ == '__main__':
     screen = pg.display.set_mode((WIDTH, HEIGTH))

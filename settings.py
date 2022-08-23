@@ -1,5 +1,7 @@
 WHITE = (255,)*3
-BLACK = (0,)*3
+BLACK = (100,)*3
+GREY  = (150,)*3
+
 WIDTH    = 1280
 HEIGTH   = 720
 FPS      = 60
