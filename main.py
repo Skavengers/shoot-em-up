@@ -1,6 +1,6 @@
+import random
 import pygame as pg
 from settings import *
-from levelup import *
 
 class Ship:
     def __init__(self, link_sprite, health=10, lvl=0, power=3):
@@ -15,17 +15,62 @@ class Ship:
         self.sprite.set_colorkey(WHITE)
         self.rect = self.sprite.get_rect(topleft=[100, 100])
         self.pos_shoot = []
+        self.levelup = False
+        self.font = pg.font.SysFont("earthorbiter.ttf", 70)
     def draw(self,rectyeux):
         red = (255,0,0)
-        font = pg.font.SysFont("earthorbiter.ttf", 70)
-        show_health = font.render(str(self.health), True, red)
-        show_power = font.render("Power: "+str(self.power),True, BLACK)
+        show_health = self.font.render(str(self.health), True, red)
+        show_power = self.font.render("Power: "+str(self.power), True, BLACK)
         screen.blit(show_health, (20, 20))
         screen.blit(show_power,(900,20))
         if self.rect.colliderect(rectyeux):
             screen.blit(self.true_sprite, self.true_rect)
         else:
             screen.blit(self.sprite, self.rect)
+        """if self.rect.colliderect(mobxp.rect):
+            self.lvl += 1
+            self.levelup = True"""
+    def object(self):
+        statement = self.font.render("choose your ability ", True, BLACK)
+        list_object = [["C:/Users/franc/PycharmProjects/shoot/Assets/objects/strong steel.png", "carac", "hp", 1],
+                       ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/WingofHermes.png", "carac", "speed", 1],
+                       ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/double-barrel.png", "special", ],
+                       ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/speedybullet.png", "carace"]]
+        random.shuffle(list_object)
+        img_object1 = pg.image.load(list_object[0][0])
+        img_object2 = pg.image.load(list_object[1][0])
+        img_object3 = pg.image.load(list_object[2][0])
+        choose = True
+        x = 590
+        while choose:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    pg.quit()
+            keys = pg.key.get_pressed()
+            if keys[pg.K_LEFT]:
+                if x >= 90:
+                    x -= 400
+                    print("ppp")
+                else:
+                    x = 890
+                    print("no")
+            if keys[pg.K_RIGHT]:
+                if x != 890:
+                    x += 400
+                else:
+                    x = 90
+            if keys[pg.K_KP_ENTER]:
+                choose = False
+            screen.blit(img_object1, (100, 150))
+            screen.blit(img_object2, (500, 150))
+            screen.blit(img_object3, (900, 150))
+            screen.blit(self.sprite, (x, 700))
+            screen.blit(statement, (WIDTH//2, 50))
+            pg.display.flip()
+            clock.tick(FPS)
+
+
+
     def die(self):
         """animation qui prend tout l’écran qui doit être plus petite pour ne pas impacter son coéquippier"""
         die_animation_list = [pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\die\animation.png").convert(),
@@ -76,7 +121,6 @@ class Ship:
             return True
         except:
             return False
-
     def keys(self,count,rectyeux):
         keys = pg.key.get_pressed()
         if self.true_rect.colliderect(rectyeux):
@@ -97,26 +141,68 @@ class Ship:
             self.pos_shoot.append([self.rect.x, self.rect.y])
         if keys[pg.K_a] and not self.laser() and self.power != 0:
             self.uselaser()
+        if keys[pg.K_u]:
+            self.object()
+
+
+class IAshooter:
+    def __init__(self,x,y,health,sprite):
+        self.x = x
+        self.y = y
+        self.health = health
+        self.sprite = pg.image.load(sprite).convert_alpha()
+        self.rect = self.sprite.get_rect()
+    def draw(self):
+        screen.blit(self.sprite,(self.x,self.y))
+
+class Xpbullet(IAshooter):
+    def __init__(self):
+        super().__init__(random.randint(0,HEIGTH),-10,1,"C:/Users/franc/PycharmProjects/shoot/Assets/xpbullet.png")
+
+
 
 class Object:
-    def __init__(self, name, str_carac, img):
-        self.card_background = ""
-        self.name = name
-        self.str_carac = str_carac
+    def __init__(self, img, type, precise_type, nb):
         self.img = pg.image.load(img).convert()
-        self.font = pg.font.SysFont("essential.ttf", 50)
+        self.type = type
+        self.precise_type = precise_type
+        self.nb = nb
+        if self.type == "carac":
+            if self.precise_type == "hp":
+                e = ""
     def draw(self):
-        text_name = self.font.render(self.name, True, GREY)
-        text_carac = self.font.render(self.str_carac, True, GREY)
-        screen.blit(text_name,(500,50))
-        screen.blit(self.img,(300,100))
-        screen.blit(text_carac,(500,800))
+        screen.blit(self.img, (300, 100))
 
+
+def chooseupgrape():
+    keys = pg.key.get_pressed()
+    if keys[pg.K_LEFT]:
+        pass
+    if keys[pg.K_RIGHT]:
+        pass
+    if keys[pg.K_KP_ENTER]:
+        pass
 
 def lvlup():
-    list_object = [["stong steel","give +1 health ","C:/Users/franc/PycharmProjects/shoot/Assets/objects/strong steel.png"],[""]]
-    ob = Object(list_object[0][0],list_object[0][1],list_object[0][2])
-    ob.draw()
+    #oof = pg.mixer.Sound('C:/Users/franc/PycharmProjects/shoot/Assets/Sound/noise/roblox-death-sound-oof-sound-effect-hd-homemadesoundeffects.mp3')
+    list_object = [["C:/Users/franc/PycharmProjects/shoot/Assets/objects/strong steel.png","carac","hp",1],
+                   ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/WingofHermes.png","carac","speed",1],
+                   ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/double-barrel.png","special",]]
+    random.shuffle(list_object)
+    object1 = Object(list_object[0][0],list_object[0][1],list_object[0][2],100,100)
+    object2 = Object(list_object[1][0],list_object[1][1],list_object[1][2],500,100)
+    object3 = Object(list_object[2][0],list_object[2][1],list_object[2][2],900,100)
+    object1.draw()
+    object2.draw()
+    object3.draw()
+    while True:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+        Choice = chooseupgrape()
+
+
+
 
 
 
@@ -129,9 +215,12 @@ def run():
     icon = pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\pycon.png").convert()
     background = pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\background.jpg").convert()
     monster1 = pg.image.load(r'C:\Users\franc\PycharmProjects\shoot\Assets\yeux.jpg').convert()
+    filemusic = pg.mixer.Sound("C:\\Users\\franc\\PycharmProjects\\shoot\\Assets\\Sound\\music\\BlueBoi.ogg")
+    filemusic.play()
     monster1.set_colorkey(WHITE)
     pg.display.set_icon(icon)
     rectyeux = monster1.get_rect(topleft=[200, 200])
+    mobxp = Xpbullet()
     ship = Ship(r'C:\Users\franc\PycharmProjects\shoot\Assets\char1.png',10)
     count = 0
     while True:
@@ -140,8 +229,9 @@ def run():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 pg.quit()
-        """lvlup()"""
-
+        if ship.levelup :
+            lvlup()
+            ship.levelup = False
         ship.keys(count, rectyeux)
         islaseractivate = ship.laser()
         if islaseractivate:
@@ -153,6 +243,7 @@ def run():
             ship.die()
 
         screen.blit(monster1,rectyeux)
+        mobxp.draw()
         ship.draw(rectyeux)
         pg.display.flip()
         clock.tick(FPS)
@@ -161,6 +252,7 @@ def run():
 if __name__ == '__main__':
     screen = pg.display.set_mode((WIDTH, HEIGTH))
     pg.init()
+    pg.mixer.init()
+    pg.mouse.set_visible(False)
     clock = pg.time.Clock()
     run()
-
