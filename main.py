@@ -1,7 +1,7 @@
 import random
 import pygame as pg
 from settings import *
-
+from  IA import Xpbullet
 class Ship:
     def __init__(self, link_sprite, health=10, lvl=0, power=3):
         self.time_laser = 0
@@ -17,6 +17,7 @@ class Ship:
         self.pos_shoot = []
         self.levelup = False
         self.font = pg.font.SysFont("earthorbiter.ttf", 70)
+        self.speed = 5
     def draw(self,rectyeux):
         red = (255,0,0)
         show_health = self.font.render(str(self.health), True, red)
@@ -33,38 +34,57 @@ class Ship:
     def object(self):
         statement = self.font.render("choose your ability ", True, BLACK)
         list_object = [["C:/Users/franc/PycharmProjects/shoot/Assets/objects/strong steel.png", "carac", "hp", 1],
-                       ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/WingofHermes.png", "carac", "speed", 1],
+                       ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/WingofHermes.png", "carac", "speed", 1000],
                        ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/double-barrel.png", "special", ],
-                       ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/speedybullet.png", "carace"]]
+                       ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/speedybullet.png", "carac", "speedbullet",5],
+                       [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\bomb.png","special", ""],
+                       [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\nothing.png", "special",""]]
         random.shuffle(list_object)
         img_object1 = pg.image.load(list_object[0][0])
         img_object2 = pg.image.load(list_object[1][0])
         img_object3 = pg.image.load(list_object[2][0])
         choose = True
         x = 590
+        count = 0
         while choose:
+            count += 1
+            screen.fill(BLACK)
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     pg.quit()
             keys = pg.key.get_pressed()
-            if keys[pg.K_LEFT]:
-                if x >= 90:
-                    x -= 400
-                    print("ppp")
+            if keys[pg.K_LEFT] :
+
+                if x == 1000:
+                    x = 590
+                elif x == 190:
+                    x = 1000
+                elif x == 590 :
+                    x = 190
+            elif keys[pg.K_RIGHT] and count % (FPS/5) == 0:
+                if x == 1000 :
+                    x = 190
+                elif x == 590 :
+                    x = 1000
                 else:
-                    x = 890
-                    print("no")
-            if keys[pg.K_RIGHT]:
-                if x != 890:
-                    x += 400
-                else:
-                    x = 90
-            if keys[pg.K_KP_ENTER]:
+                    x = 590
+            if keys[pg.K_e]:
                 choose = False
+                if x == 190:
+                    choice = 0
+                if x == 590:
+                    choice = 1
+                if x == 1000:
+                    choice = 2
+                if list_object[choice][1] == "carac":
+                    if list_object[choice][2] == "hp":
+                        self.health += list_object[choice][3]
+                    if list_object[choice][2] == "speed":
+                        self.speed += list_object[choice][3]
             screen.blit(img_object1, (100, 150))
             screen.blit(img_object2, (500, 150))
             screen.blit(img_object3, (900, 150))
-            screen.blit(self.sprite, (x, 700))
+            screen.blit(self.sprite, (x, 600))
             screen.blit(statement, (WIDTH//2, 50))
             pg.display.flip()
             clock.tick(FPS)
@@ -126,17 +146,17 @@ class Ship:
         if self.true_rect.colliderect(rectyeux):
             self.health -= 1
         if keys[pg.K_LEFT] and self.rect.x>0 :
-            self.rect.left-= SPEED
-            self.true_rect.left-= SPEED
+            self.rect.left-= self.speed
+            self.true_rect.left-= self.speed
         if keys[pg.K_RIGHT] and self.rect.x<WIDTH-SIZE_w :
-            self.rect.right += SPEED
-            self.true_rect.right += SPEED
+            self.rect.right += self.speed
+            self.true_rect.right += self.speed
         if keys[pg.K_UP] and self.rect.y>0 :
-            self.rect.top -= SPEED
-            self.true_rect.top -= SPEED
+            self.rect.top -= self.speed
+            self.true_rect.top -= self.speed
         if keys[pg.K_DOWN] and self.rect.y<HEIGTH-SIZE_h :
-            self.rect.bottom += SPEED
-            self.true_rect.bottom += SPEED
+            self.rect.bottom += self.speed
+            self.true_rect.bottom += self.speed
         if keys[pg.K_b] and count % (FPS/4) == 0 and not self.laser():
             self.pos_shoot.append([self.rect.x, self.rect.y])
         if keys[pg.K_a] and not self.laser() and self.power != 0:
@@ -145,71 +165,8 @@ class Ship:
             self.object()
 
 
-class IAshooter:
-    def __init__(self,x,y,health,sprite):
-        self.x = x
-        self.y = y
-        self.health = health
-        self.sprite = pg.image.load(sprite).convert_alpha()
-        self.rect = self.sprite.get_rect()
-    def draw(self):
-        screen.blit(self.sprite,(self.x,self.y))
-
-class Xpbullet(IAshooter):
-    def __init__(self):
-        super().__init__(random.randint(0,HEIGTH),-10,1,"C:/Users/franc/PycharmProjects/shoot/Assets/xpbullet.png")
-
-
-
-class Object:
-    def __init__(self, img, type, precise_type, nb):
-        self.img = pg.image.load(img).convert()
-        self.type = type
-        self.precise_type = precise_type
-        self.nb = nb
-        if self.type == "carac":
-            if self.precise_type == "hp":
-                e = ""
-    def draw(self):
-        screen.blit(self.img, (300, 100))
-
-
-def chooseupgrape():
-    keys = pg.key.get_pressed()
-    if keys[pg.K_LEFT]:
-        pass
-    if keys[pg.K_RIGHT]:
-        pass
-    if keys[pg.K_KP_ENTER]:
-        pass
-
-def lvlup():
-    #oof = pg.mixer.Sound('C:/Users/franc/PycharmProjects/shoot/Assets/Sound/noise/roblox-death-sound-oof-sound-effect-hd-homemadesoundeffects.mp3')
-    list_object = [["C:/Users/franc/PycharmProjects/shoot/Assets/objects/strong steel.png","carac","hp",1],
-                   ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/WingofHermes.png","carac","speed",1],
-                   ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/double-barrel.png","special",]]
-    random.shuffle(list_object)
-    object1 = Object(list_object[0][0],list_object[0][1],list_object[0][2],100,100)
-    object2 = Object(list_object[1][0],list_object[1][1],list_object[1][2],500,100)
-    object3 = Object(list_object[2][0],list_object[2][1],list_object[2][2],900,100)
-    object1.draw()
-    object2.draw()
-    object3.draw()
-    while True:
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                pg.quit()
-        Choice = chooseupgrape()
-
-
-
-
-
-
-
 
 def run():
-    global SPEED
     font = pg.font.SysFont("earthorbiter.ttf", 70)
     pg.display.set_caption('to the moon')
     icon = pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\pycon.png").convert()
@@ -220,8 +177,9 @@ def run():
     monster1.set_colorkey(WHITE)
     pg.display.set_icon(icon)
     rectyeux = monster1.get_rect(topleft=[200, 200])
-    mobxp = Xpbullet()
+    """mobxp = Xpbullet()"""
     ship = Ship(r'C:\Users\franc\PycharmProjects\shoot\Assets\char1.png',10)
+    xpmob = Xpbullet(screen)
     count = 0
     while True:
         screen.blit(background, (0, 0))
@@ -230,21 +188,21 @@ def run():
             if event.type == pg.QUIT:
                 pg.quit()
         if ship.levelup :
-            lvlup()
+            """lvlup()"""
             ship.levelup = False
         ship.keys(count, rectyeux)
         islaseractivate = ship.laser()
         if islaseractivate:
-            SPEED = 1
+            ship.speed = 1
         else:
-            SPEED = 5
+            ship.speed = 5
         ship.bullet()
         if ship.health == 0:
             ship.die()
-
         screen.blit(monster1,rectyeux)
-        mobxp.draw()
+        """mobxp.draw()"""
         ship.draw(rectyeux)
+        xpmob.draw()
         pg.display.flip()
         clock.tick(FPS)
 
