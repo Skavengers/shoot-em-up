@@ -1,7 +1,8 @@
 import random
 import pygame as pg
 from settings import *
-from  IA import Xpbullet
+from IA import Xpbullet
+
 class Ship:
     def __init__(self, link_sprite, health=10, lvl=0, power=3):
         self.time_laser = 0
@@ -17,7 +18,8 @@ class Ship:
         self.pos_shoot = []
         self.levelup = False
         self.font = pg.font.SysFont("earthorbiter.ttf", 70)
-        self.speed = 5
+        self.speed = 6
+        self.oldspeed = self.speed
     def draw(self,rectyeux):
         red = (255,0,0)
         show_health = self.font.render(str(self.health), True, red)
@@ -53,8 +55,7 @@ class Ship:
                 if event.type == pg.QUIT:
                     pg.quit()
             keys = pg.key.get_pressed()
-            if keys[pg.K_LEFT] :
-
+            if keys[pg.K_LEFT]and count % (FPS/5) == 0:
                 if x == 1000:
                     x = 590
                 elif x == 190:
@@ -88,9 +89,6 @@ class Ship:
             screen.blit(statement, (WIDTH//2, 50))
             pg.display.flip()
             clock.tick(FPS)
-
-
-
     def die(self):
         """animation qui prend tout l’écran qui doit être plus petite pour ne pas impacter son coéquippier"""
         die_animation_list = [pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\die\animation.png").convert(),
@@ -100,7 +98,6 @@ class Ship:
         walk = True
         while walk:
             if value >= len(die_animation_list):
-                """value = 0"""
                 break
             pg.display.update()
             die_animation = die_animation_list[value]
@@ -123,6 +120,10 @@ class Ship:
         self.time_laser = 6
         self.power -=1
     def laser(self):
+        if self.speed !=1:
+            self.oldspeed = self.speed
+        if self.time_laser == 6:
+            self.speed = 1
         laser_animation = [pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\laser\laser.png").convert_alpha(),
                            pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\laser\laser1.png").convert_alpha(),
                            pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\laser\laser2A.png").convert_alpha(),
@@ -133,6 +134,7 @@ class Ship:
                            pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\laser\laser7.png").convert_alpha(),
                            pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\laser\laser8.png").convert_alpha()]
         int_time_run = int(self.time_laser)
+
         try:
             die_animation = laser_animation[int_time_run]
             die_animation.set_colorkey(WHITE)
@@ -140,7 +142,7 @@ class Ship:
             self.time_laser -= 1 / 30
             return True
         except:
-            return False
+            self.speed = self.oldspeed
     def keys(self,count,rectyeux):
         keys = pg.key.get_pressed()
         if self.true_rect.colliderect(rectyeux):
@@ -177,9 +179,9 @@ def run():
     monster1.set_colorkey(WHITE)
     pg.display.set_icon(icon)
     rectyeux = monster1.get_rect(topleft=[200, 200])
-    """mobxp = Xpbullet()"""
+
     ship = Ship(r'C:\Users\franc\PycharmProjects\shoot\Assets\char1.png',10)
-    xpmob = Xpbullet(screen)
+    xpmob = Xpbullet(screen, 200)
     count = 0
     while True:
         screen.blit(background, (0, 0))
@@ -188,19 +190,16 @@ def run():
             if event.type == pg.QUIT:
                 pg.quit()
         if ship.levelup :
-            """lvlup()"""
             ship.levelup = False
         ship.keys(count, rectyeux)
-        islaseractivate = ship.laser()
-        if islaseractivate:
-            ship.speed = 1
-        else:
-            ship.speed = 5
         ship.bullet()
+        ship.laser()
+        xpcollid = xpmob.collide(ship.rect)
+        if xpcollid:
+            ship.power = 100
         if ship.health == 0:
             ship.die()
-        screen.blit(monster1,rectyeux)
-        """mobxp.draw()"""
+        screen.blit(monster1, rectyeux)
         ship.draw(rectyeux)
         xpmob.draw()
         pg.display.flip()
