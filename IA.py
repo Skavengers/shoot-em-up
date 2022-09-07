@@ -9,9 +9,10 @@ class IAshooter:
         self.y = y
         self.health = health
         self.sprite = pg.image.load(sprite).convert_alpha()
-        self.rect = self.sprite.get_rect()
+        self.rect = self.sprite.get_rect(topleft=[self.x, self.y])
         self.screen = screen
     def draw(self):
+        self.rect = self.sprite.get_rect(topleft=[self.x, self.y])
         self.screen.blit(self.sprite,(self.x,self.y))
 
 

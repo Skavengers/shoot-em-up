@@ -30,9 +30,6 @@ class Ship:
             screen.blit(self.true_sprite, self.true_rect)
         else:
             screen.blit(self.sprite, self.rect)
-        """if self.rect.colliderect(mobxp.rect):
-            self.lvl += 1
-            self.levelup = True"""
     def object(self):
         statement = self.font.render("choose your ability ", True, BLACK)
         list_object = [["C:/Users/franc/PycharmProjects/shoot/Assets/objects/strong steel.png", "carac", "hp", 1],
@@ -176,6 +173,7 @@ def run():
     monster1 = pg.image.load(r'C:\Users\franc\PycharmProjects\shoot\Assets\yeux.jpg').convert()
     filemusic = pg.mixer.Sound("C:\\Users\\franc\\PycharmProjects\\shoot\\Assets\\Sound\\music\\BlueBoi.ogg")
     filemusic.play()
+    filemusic.stop()
     monster1.set_colorkey(WHITE)
     pg.display.set_icon(icon)
     rectyeux = monster1.get_rect(topleft=[200, 200])
@@ -189,19 +187,24 @@ def run():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 pg.quit()
-        if ship.levelup :
-            ship.levelup = False
         ship.keys(count, rectyeux)
         ship.bullet()
         ship.laser()
         xpcollid = xpmob.collide(ship.rect)
         if xpcollid:
-            ship.power = 100
+            xpmob.y = -100
+            xpmob.x = -100
+            ship.lvl += 1
+            ship.levelup = True
+        else:
+            xpmob.draw()
+        if ship.levelup == True:
+            ship.object()
+            ship.levelup = False
         if ship.health == 0:
             ship.die()
         screen.blit(monster1, rectyeux)
         ship.draw(rectyeux)
-        xpmob.draw()
         pg.display.flip()
         clock.tick(FPS)
 
