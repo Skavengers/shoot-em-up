@@ -1,7 +1,7 @@
 import random
 import pygame as pg
 from settings import *
-from IA import Xpbullet
+from IA import Xpbullet, Chest, Eyes
 
 class Ship:
     def __init__(self, link_sprite, health=10, lvl=0, power=3):
@@ -20,6 +20,7 @@ class Ship:
         self.font = pg.font.SysFont("earthorbiter.ttf", 70)
         self.speed = 6
         self.oldspeed = self.speed
+        self.shoot_speed = 10
     def draw(self,rectyeux):
         red = (255,0,0)
         show_health = self.font.render(str(self.health), True, red)
@@ -35,9 +36,10 @@ class Ship:
         list_object = [["C:/Users/franc/PycharmProjects/shoot/Assets/objects/strong steel.png", "carac", "hp", 1],
                        ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/WingofHermes.png", "carac", "speed", 1000],
                        ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/double-barrel.png", "special", ],
-                       ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/speedybullet.png", "carac", "speedbullet",5],
-                       [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\bomb.png","special", ""],
-                       [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\nothing.png", "special",""]]
+                       ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/speedybullet.png", "carac", "shoot_speed", 5],
+                       [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\bomb.png", "special", ""],
+                       [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\nothing.png", "special", ""],
+                       [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\pow.png","carac", "power", 1]]
         random.shuffle(list_object)
         img_object1 = pg.image.load(list_object[0][0])
         img_object2 = pg.image.load(list_object[1][0])
@@ -75,10 +77,14 @@ class Ship:
                 if x == 1000:
                     choice = 2
                 if list_object[choice][1] == "carac":
-                    if list_object[choice][2] == "hp":
+                    if list_object[choice][2] == "hp" and self.health <100:
                         self.health += list_object[choice][3]
-                    if list_object[choice][2] == "speed":
+                    if list_object[choice][2] == "speed" and self.speed <20:
                         self.speed += list_object[choice][3]
+                    if list_object[choice][2] == "power":
+                        self.power += list_object[choice][3]
+                    if list_object[choice][2] == "shoot_speed":
+                        self.shoot_speed += list_object[choice][3]
             screen.blit(img_object1, (100, 150))
             screen.blit(img_object2, (500, 150))
             screen.blit(img_object3, (900, 150))
@@ -108,7 +114,7 @@ class Ship:
         for i in range(len(self.pos_shoot)):
             i -= compteur
             if len(self.pos_shoot) != 0:
-                self.pos_shoot[i][1] -= int(SHOOT_SPEED)
+                self.pos_shoot[i][1] -= int(self.shoot_speed)
                 screen.blit(sprite_bullet, (self.pos_shoot[i][0] + sprite_bullet.get_width()/2-4, self.pos_shoot[i][1]))
                 if self.pos_shoot[i][1] < 0:
                     del self.pos_shoot[i]
@@ -140,10 +146,8 @@ class Ship:
             return True
         except:
             self.speed = self.oldspeed
-    def keys(self,count,rectyeux):
+    def keys(self,count):
         keys = pg.key.get_pressed()
-        if self.true_rect.colliderect(rectyeux):
-            self.health -= 1
         if keys[pg.K_LEFT] and self.rect.x>0 :
             self.rect.left-= self.speed
             self.true_rect.left-= self.speed
@@ -160,8 +164,6 @@ class Ship:
             self.pos_shoot.append([self.rect.x, self.rect.y])
         if keys[pg.K_a] and not self.laser() and self.power != 0:
             self.uselaser()
-        if keys[pg.K_u]:
-            self.object()
 
 
 
@@ -187,7 +189,7 @@ def run():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 pg.quit()
-        ship.keys(count, rectyeux)
+        ship.keys(count)
         ship.bullet()
         ship.laser()
         xpcollid = xpmob.collide(ship.rect)
