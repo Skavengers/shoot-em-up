@@ -182,6 +182,8 @@ def run():
 
     ship = Ship(r'C:\Users\franc\PycharmProjects\shoot\Assets\char1.png',10)
     xpmob = Xpbullet(screen, 200)
+    chest = Chest(screen)
+    eye = Eyes(screen)
     count = 0
     while True:
         screen.blit(background, (0, 0))
@@ -192,6 +194,7 @@ def run():
         ship.keys(count)
         ship.bullet()
         ship.laser()
+
         xpcollid = xpmob.collide(ship.rect)
         if xpcollid:
             xpmob.y = -100
@@ -200,6 +203,14 @@ def run():
             ship.levelup = True
         else:
             xpmob.draw()
+
+        chestcollid = chest.collide(ship.rect)
+        if chestcollid:
+            xpmob.y = -100
+            xpmob.x = -100
+        else:
+            chest.draw()
+        eye.draw()
         if ship.levelup == True:
             ship.object()
             ship.levelup = False
