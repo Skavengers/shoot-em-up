@@ -31,7 +31,7 @@ class Ship:
             screen.blit(self.true_sprite, self.true_rect)
         else:
             screen.blit(self.sprite, self.rect)
-    def object(self):
+    def object(self,):
         statement = self.font.render("choose your ability ", True, BLACK)
         list_object = [["C:/Users/franc/PycharmProjects/shoot/Assets/objects/strong steel.png", "carac", "hp", 1],
                        ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/WingofHermes.png", "carac", "speed", 1000],
@@ -97,6 +97,21 @@ class Ship:
         die_animation_list = [pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\die\animation.png").convert(),
                          pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\die\animation2.png").convert(),
                          pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\die\animation3.png").convert()]
+        value = 0
+        walk = True
+        while walk:
+            if value >= len(die_animation_list):
+                break
+            pg.display.update()
+            die_animation = die_animation_list[value]
+            screen.blit(die_animation, (0, 0))
+            clock.tick(1)
+            value += 1
+    def animO(self):
+        """animation qui prend tout l’écran qui doit être plus petite pour ne pas impacter son coéquippier"""
+        die_animation_list = [pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\brouillonanimation.png").convert_alpha(),
+                         pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\die\animation2.png").convert_alpha(),
+                         pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\die\animation3.png").convert_alpha()]
         value = 0
         walk = True
         while walk:
@@ -183,7 +198,7 @@ def run():
     ship = Ship(r'C:\Users\franc\PycharmProjects\shoot\Assets\char1.png',10)
     xpmob = Xpbullet(screen, 200)
     chest = Chest(screen)
-    eye = Eyes(screen)
+    eye = Eyes(screen,600,100)
     count = 0
     while True:
         screen.blit(background, (0, 0))
@@ -211,6 +226,8 @@ def run():
         else:
             chest.draw()
         eye.draw()
+        if eye.collide(ship.rect):
+            ship.health -= 1
         if ship.levelup == True:
             ship.object()
             ship.levelup = False
