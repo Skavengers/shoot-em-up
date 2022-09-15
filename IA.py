@@ -57,6 +57,8 @@ class Eyes(IAshooter):
         super().__init__(x,y,1,"C:/Users/franc/PycharmProjects/shoot/Assets/yeux.jpg",screen)
         self.sprite.set_colorkey(WHITE)
     def draw(self):
+        self.x += random.randint(-2,2)
+        self.y += 1
         super(Eyes, self).draw()
     def collide(self, obj):
         self.rect = self.sprite.get_rect(topleft=[self.x, self.y])
