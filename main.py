@@ -179,6 +179,25 @@ class Ship:
             self.pos_shoot.append([self.rect.x, self.rect.y])
         if keys[pg.K_a] and not self.laser() and self.power != 0:
             self.uselaser()
+class Order:
+    def __init__(self):
+        self.begin = pg.time.get_ticks()
+        self.m = 0
+    def coming(self):
+        # tappend = [[time, the thing you want to do
+
+        tappend = [[10, "chest"], [20, "XP"]]#,[],[],[],[],[],[],[],[],[],[],[],[],]
+        now = pg.time.get_ticks()
+
+        try:
+            if now - self.begin >= tappend[self.m][0]:
+                self.last = now
+                self.begin = now
+                self.m += 1
+        except:
+            return False
+
+
 
 
 
@@ -195,6 +214,8 @@ def run():
     pg.display.set_icon(icon)
     rectyeux = monster1.get_rect(topleft=[200, 200])
 
+    coming = True
+    order = Order()
     ship = Ship(r'C:\Users\franc\PycharmProjects\shoot\Assets\char1.png',10)
     xpmob = Xpbullet(screen, 200)
     chest = Chest(screen)
@@ -210,6 +231,8 @@ def run():
         ship.bullet()
         ship.laser()
 
+        if not coming == False:
+            coming = order.coming()
         xpcollid = xpmob.collide(ship.rect)
         if xpcollid:
             xpmob.y = -100
