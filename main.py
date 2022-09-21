@@ -246,8 +246,6 @@ class Order:
         self.begin = pg.time.get_ticks()
         self.m = 0
     def coming(self):
-        # tappend = [[time, the thing you want to do
-
         tappend = [[10, "chest"], [20, "XP"]]#,[],[],[],[],[],[],[],[],[],[],[],[],]
         now = pg.time.get_ticks()
 
