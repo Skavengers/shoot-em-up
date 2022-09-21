@@ -4,10 +4,9 @@ from settings import *
 from IA import Xpbullet, Chest, Eyes
 
 class Ship:
-    def __init__(self, link_sprite, health=10, lvl=0, power=3):
+    def __init__(self, link_sprite, lvl=0, power=3):
         self.time_laser = 0
         self.lvl = lvl
-        self.health = health
         self.power = power
         self.sprite = pg.image.load(link_sprite).convert_alpha()
         self.true_sprite = pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\truesprite.png").convert_alpha()
@@ -16,25 +15,66 @@ class Ship:
         self.sprite.set_colorkey(WHITE)
         self.rect = self.sprite.get_rect(topleft=[100, 100])
         self.pos_shoot = []
-        self.levelup = False
-        self.font = pg.font.SysFont("earthorbiter.ttf", 70)
+        self.font = pg.font.Font("C:\\Users\\franc\\PycharmProjects\\shoot\\police\\neuropol\\neuropol.otf", 40)
         self.speed = 6
         self.oldspeed = self.speed
         self.shoot_speed = 10
+
+        self.target_health = 500
+        self.current_health = 200
+        self.max_health = 1000
+        self.health_bar_length = 200
+        self.health_ratio = self.max_health / self.health_bar_length
+        self.health_change_speed = 5
+
+    def advanced_health(self):
+        transition_width = 0
+        transition_color = (255, 0, 0)
+
+        if self.current_health < self.target_health:
+            self.current_health += self.health_change_speed
+            transition_width = int((self.target_health - self.current_health) / self.health_ratio)
+            transition_color = (0, 255, 0)
+
+        if self.current_health > self.target_health:
+            self.current_health -= self.health_change_speed
+            transition_width = int((self.target_health - self.current_health) / self.health_ratio)
+            transition_color = (255, 255, 0)
+
+        health_bar_width = int(self.current_health / self.health_ratio)
+        health_bar = pg.Rect(10, 20, health_bar_width, 25)
+        transition_bar = pg.Rect(health_bar.right, 20, transition_width, 25)
+
+        pg.draw.rect(screen, (255, 0, 0), health_bar)
+        pg.draw.rect(screen, transition_color, transition_bar)
+        pg.draw.rect(screen, (255, 255, 255), (10, 20, self.health_bar_length, 25), 4)
+
+    def get_damage(self, amount):
+        if self.target_health > 0:
+            self.target_health -= amount
+        if self.target_health < 0:
+            self.target_health = 0
+
+    def get_health(self, amount):
+        if self.target_health < self.max_health:
+            self.target_health += amount
+        if self.target_health > self.max_health:
+            self.target_health = self.max_health
+
     def draw(self,rectyeux):
-        red = (255,0,0)
-        show_health = self.font.render(str(self.health), True, red)
-        show_power = self.font.render("Power: "+str(self.power), True, BLACK)
-        screen.blit(show_health, (20, 20))
+        show_power = self.font.render("POWER: "+str(self.power), True, BLACK)
         screen.blit(show_power,(900,20))
+        self.advanced_health()
         if self.rect.colliderect(rectyeux):
             screen.blit(self.true_sprite, self.true_rect)
         else:
             screen.blit(self.sprite, self.rect)
     def object(self,):
-        statement = self.font.render("choose your ability ", True, BLACK)
-        list_object = [["C:/Users/franc/PycharmProjects/shoot/Assets/objects/strong steel.png", "carac", "hp", 1],
-                       ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/WingofHermes.png", "carac", "speed", 1000],
+        self.animO()
+        statement = self.font.render("CHOOSE YOUR ABILITY !", True, RED)
+        background = pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\nf.png").convert()
+        list_object = [["C:/Users/franc/PycharmProjects/shoot/Assets/objects/strong steel.png", "carac", "hp", 200],
+                       ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/WingofHermes.png", "carac", "speed", 3],
                        ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/double-barrel.png", "special", ],
                        ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/speedybullet.png", "carac", "shoot_speed", 5],
                        [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\bomb.png", "special", ""],
@@ -47,21 +87,23 @@ class Ship:
         choose = True
         x = 590
         count = 0
+        action = pg.time.get_ticks()
         while choose:
             count += 1
-            screen.fill(BLACK)
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     pg.quit()
             keys = pg.key.get_pressed()
-            if keys[pg.K_LEFT]and count % (FPS/5) == 0:
+            if keys[pg.K_LEFT] and pg.time.get_ticks() - 500 > action:
+                action = pg.time.get_ticks()
                 if x == 1000:
                     x = 590
                 elif x == 190:
                     x = 1000
                 elif x == 590 :
                     x = 190
-            elif keys[pg.K_RIGHT] and count % (FPS/5) == 0:
+            elif keys[pg.K_RIGHT] and pg.time.get_ticks() - 300 > action:
+                action = pg.time.get_ticks()
                 if x == 1000 :
                     x = 190
                 elif x == 590 :
@@ -77,14 +119,15 @@ class Ship:
                 if x == 1000:
                     choice = 2
                 if list_object[choice][1] == "carac":
-                    if list_object[choice][2] == "hp" and self.health <100:
-                        self.health += list_object[choice][3]
+                    if list_object[choice][2] == "hp":
+                        self.get_health(list_object[choice][3])
                     if list_object[choice][2] == "speed" and self.speed <20:
                         self.speed += list_object[choice][3]
                     if list_object[choice][2] == "power":
                         self.power += list_object[choice][3]
                     if list_object[choice][2] == "shoot_speed":
                         self.shoot_speed += list_object[choice][3]
+            screen.blit(background, (0, 0))
             screen.blit(img_object1, (100, 150))
             screen.blit(img_object2, (500, 150))
             screen.blit(img_object3, (900, 150))
@@ -108,19 +151,38 @@ class Ship:
             clock.tick(1)
             value += 1
     def animO(self):
-        """animation qui prend tout l’écran qui doit être plus petite pour ne pas impacter son coéquippier"""
-        die_animation_list = [pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\brouillonanimation.png").convert_alpha(),
-                         pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\die\animation2.png").convert_alpha(),
-                         pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\die\animation3.png").convert_alpha()]
+        """animation qui prend tout l’écran utiliser pour choisir la carte que l’on veut"""
+        animation_list = [pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n1.png").convert_alpha(),
+                              pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n2.png").convert_alpha(),
+                              pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n3.png").convert_alpha(),
+                              pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n4png.png").convert_alpha(),
+                              pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n5png.png").convert_alpha(),
+                              pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n6png.png").convert_alpha(),
+                              pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n7png.png").convert_alpha(),
+                              pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n8png.png").convert_alpha(),
+                              pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n9png.png").convert_alpha(),
+                              pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n10png.png").convert_alpha(),
+                              pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n11png.png").convert_alpha(),
+                              pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n12png.png").convert_alpha(),
+                              pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n13png.png").convert_alpha(),
+                              pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n14png.png").convert_alpha(),
+                              pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n15png.png").convert_alpha(),
+                              pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n16png.png").convert_alpha(),
+                              pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n17png.png").convert_alpha(),
+                              pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n18png.png").convert_alpha(),
+                              pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n19png.png").convert_alpha(),
+                              pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n19png.png").convert_alpha(),
+                              ]
         value = 0
         walk = True
         while walk:
-            if value >= len(die_animation_list):
+            if value >= len(animation_list):
                 break
             pg.display.update()
-            die_animation = die_animation_list[value]
-            screen.blit(die_animation, (0, 0))
-            clock.tick(1)
+            animation = animation_list[value]
+            animation.set_colorkey(WHITE)
+            screen.blit(animation, (0, 0))
+            clock.tick(20)
             value += 1
     def bullet(self):
         sprite_bullet = pg.image.load(r'C:\Users\franc\PycharmProjects\shoot\Assets\shoot.png').convert_alpha()
@@ -164,8 +226,8 @@ class Ship:
     def keys(self,count):
         keys = pg.key.get_pressed()
         if keys[pg.K_LEFT] and self.rect.x>0 :
-            self.rect.left-= self.speed
-            self.true_rect.left-= self.speed
+            self.rect.left -= self.speed
+            self.true_rect.left -= self.speed
         if keys[pg.K_RIGHT] and self.rect.x<WIDTH-SIZE_w :
             self.rect.right += self.speed
             self.true_rect.right += self.speed
@@ -216,7 +278,7 @@ def run():
 
     coming = True
     order = Order()
-    ship = Ship(r'C:\Users\franc\PycharmProjects\shoot\Assets\char1.png',10)
+    ship = Ship(r'C:\Users\franc\PycharmProjects\shoot\Assets\char1.png',3)
     xpmob = Xpbullet(screen, 200)
     chest = Chest(screen)
     eye = Eyes(screen,600,100)
@@ -235,26 +297,15 @@ def run():
             coming = order.coming()
         xpcollid = xpmob.collide(ship.rect)
         if xpcollid:
-            xpmob.y = -100
-            xpmob.x = -100
             ship.lvl += 1
-            ship.levelup = True
-        else:
-            xpmob.draw()
+            ship.object()
 
         chestcollid = chest.collide(ship.rect)
-        if chestcollid:
-            xpmob.y = -100
-            xpmob.x = -100
-        else:
-            chest.draw()
         eye.draw()
         if eye.collide(ship.rect):
-            ship.health -= 1
-        if ship.levelup == True:
-            ship.object()
+            ship.get_damage(200)
             ship.levelup = False
-        if ship.health == 0:
+        if ship.current_health == 0:
             ship.die()
         screen.blit(monster1, rectyeux)
         ship.draw(rectyeux)

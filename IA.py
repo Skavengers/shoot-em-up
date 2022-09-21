@@ -29,9 +29,11 @@ class Xpbullet(IAshooter):
     def collide(self,obj):
         self.rect = self.sprite.get_rect(topleft=[self.x, self.y])
         if self.rect.colliderect(obj):
+            self.y = -100
+            self.x = -100
             return True
         else:
-            return False
+            self.draw()
 
 
 class Chest(IAshooter):
@@ -48,9 +50,10 @@ class Chest(IAshooter):
     def collide(self, obj):
         self.rect = self.sprite.get_rect(topleft=[self.x, self.y])
         if self.rect.colliderect(obj):
-            return True
+            self.y = -100
+            self.x = -100
         else:
-            return False
+            self.draw()
 
 class Eyes(IAshooter):
     def __init__(self,screen,x,y):
