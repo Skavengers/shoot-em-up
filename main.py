@@ -19,6 +19,7 @@ class Ship:
         self.speed = 6
         self.oldspeed = self.speed
         self.shoot_speed = 10
+        self.doublebarrel = False
 
         self.target_health = 500
         self.current_health = 200
@@ -75,8 +76,8 @@ class Ship:
         background = pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\nf.png").convert()
         list_object = [["C:/Users/franc/PycharmProjects/shoot/Assets/objects/strong steel.png", "carac", "hp", 200],
                        ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/WingofHermes.png", "carac", "speed", 3],
-                       ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/double-barrel.png", "special", ],
-                       ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/speedybullet.png", "carac", "shoot_speed", 5],
+                       ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/double-barrel.png", "special", "2shoot"],
+                       ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/speedybullet.png", "carac", "shoot_speeb", 10],
                        [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\bomb.png", "special", ""],
                        [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\nothing.png", "special", ""],
                        [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\pow.png","carac", "power", 1]]
@@ -127,6 +128,9 @@ class Ship:
                         self.power += list_object[choice][3]
                     if list_object[choice][2] == "shoot_speed":
                         self.shoot_speed += list_object[choice][3]
+                if list_object[choice][1] == "special":
+                    if list_object[choice][2] == "2shoot":
+                        self.doublebarrel = True
             screen.blit(background, (0, 0))
             screen.blit(img_object1, (100, 150))
             screen.blit(img_object2, (500, 150))
@@ -192,7 +196,9 @@ class Ship:
             i -= compteur
             if len(self.pos_shoot) != 0:
                 self.pos_shoot[i][1] -= int(self.shoot_speed)
-                screen.blit(sprite_bullet, (self.pos_shoot[i][0] + sprite_bullet.get_width()/2-4, self.pos_shoot[i][1]))
+                screen.blit(sprite_bullet, (self.pos_shoot[i][0] + sprite_bullet.get_width()/2-4 if self.doublebarrel == False else self.pos_shoot[i][0] + sprite_bullet.get_width()/2-9, self.pos_shoot[i][1]))
+                if self.doublebarrel == True:
+                    screen.blit(sprite_bullet, (self.pos_shoot[i][0] + sprite_bullet.get_width()/2+2, self.pos_shoot[i][1]))
                 if self.pos_shoot[i][1] < 0:
                     del self.pos_shoot[i]
                     compteur += 1
@@ -245,7 +251,7 @@ class Order:
     def __init__(self):
         self.begin = pg.time.get_ticks()
         self.m = 0
-    def coming(self):
+    def run(self):
         tappend = [[10, "chest"], [20, "XP"]]#,[],[],[],[],[],[],[],[],[],[],[],[],]
         now = pg.time.get_ticks()
 
@@ -291,8 +297,6 @@ def run():
         ship.bullet()
         ship.laser()
 
-        if not coming == False:
-            coming = order.coming()
         xpcollid = xpmob.collide(ship.rect)
         if xpcollid:
             ship.lvl += 1
