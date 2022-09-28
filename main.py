@@ -80,7 +80,8 @@ class Ship:
                        ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/speedybullet.png", "carac", "shoot_speeb", 10],
                        [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\bomb.png", "special", ""],
                        [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\nothing.png", "special", ""],
-                       [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\pow.png","carac", "power", 1]]
+                       [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\pow.png","carac", "power", 1],
+                       [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\shield.png","carac","hp",500]]
         random.shuffle(list_object)
         img_object1 = pg.image.load(list_object[0][0])
         img_object2 = pg.image.load(list_object[1][0])
