@@ -70,8 +70,9 @@ class Ship:
             screen.blit(self.true_sprite, self.true_rect)
         else:
             screen.blit(self.sprite, self.rect)
-    def object(self,):
+    def object(self):
         self.animO()
+        self.lvl+=1
         statement = self.font.render("CHOOSE YOUR ABILITY !", True, RED)
         background = pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\nf.png").convert()
         list_object = [["C:/Users/franc/PycharmProjects/shoot/Assets/objects/strong steel.png", "carac", "hp", 200],
@@ -140,6 +141,13 @@ class Ship:
             screen.blit(statement, (WIDTH//2, 50))
             pg.display.flip()
             clock.tick(FPS)
+    def collide(self,ufo):
+        if ufo[0] == "get_health":
+            self.get_health(ufo[1])
+        if ufo[0] == "get_damage":
+            self.get_damage(ufo[1])
+        if ufo == "object":
+            self.object()
     def die(self):
         """animation qui prend tout l’écran qui doit être plus petite pour ne pas impacter son coéquippier"""
         die_animation_list = [pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\die\animation.png").convert(),
@@ -248,28 +256,8 @@ class Ship:
             self.pos_shoot.append([self.rect.x, self.rect.y])
         if keys[pg.K_a] and not self.laser() and self.power != 0:
             self.uselaser()
-class Order:
-    def __init__(self):
-        self.begin = pg.time.get_ticks()
-        self.m = 0
-    def run(self):
-        tappend = [[10, "chest"], [20, "XP"]]#,[],[],[],[],[],[],[],[],[],[],[],[],]
-        now = pg.time.get_ticks()
-
-        try:
-            if now - self.begin >= tappend[self.m][0]:
-                self.last = now
-                self.begin = now
-                self.m += 1
-        except:
-            return False
-
-
-
-
 
 def run():
-    font = pg.font.SysFont("earthorbiter.ttf", 70)
     pg.display.set_caption('to the moon')
     icon = pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\pycon.png").convert()
     background = pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\background.jpg").convert()
@@ -280,13 +268,8 @@ def run():
     monster1.set_colorkey(WHITE)
     pg.display.set_icon(icon)
     rectyeux = monster1.get_rect(topleft=[200, 200])
-
-    coming = True
-    order = Order()
     ship = Ship(r'C:\Users\franc\PycharmProjects\shoot\Assets\char1.png',3)
-    xpmob = Xpbullet(screen, 200)
-    chest = Chest(screen)
-    eye = Eyes(screen,600,100)
+    list_enemies = [Eyes(screen, 600, 100), Xpbullet(screen, 200,-30), Xpbullet(screen, 400,-500),Eyes(screen, 100, 700), Eyes(screen, 100, 1200)]
     count = 0
     while True:
         screen.blit(background, (0, 0))
@@ -297,19 +280,12 @@ def run():
         ship.keys(count)
         ship.bullet()
         ship.laser()
-
-        xpcollid = xpmob.collide(ship.rect)
-        if xpcollid:
-            ship.lvl += 1
-            ship.object()
-
-        chestcollid = chest.collide(ship.rect)
-        eye.draw()
-        if eye.collide(ship.rect):
-            ship.get_damage(200)
-            ship.levelup = False
+        for en in list_enemies:
+            en.draw()
+            ship.collide(en.collide(ship.rect))
         if ship.current_health == 0:
             ship.die()
+
         screen.blit(monster1, rectyeux)
         ship.draw(rectyeux)
         pg.display.flip()

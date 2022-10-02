@@ -16,8 +16,8 @@ class IAshooter:
 
 
 class Xpbullet(IAshooter):
-    def __init__(self,screen,x):
-        super().__init__(x,-10,1,"C:/Users/franc/PycharmProjects/shoot/Assets/xpbullet.png",screen)
+    def __init__(self,screen,x,y):
+        super().__init__(x,y,1,"C:/Users/franc/PycharmProjects/shoot/Assets/xpbullet.png",screen)
     def draw(self):
         self.sprite = pg.transform.scale(self.sprite, (35, 35))
         super(Xpbullet, self).draw()
@@ -31,9 +31,10 @@ class Xpbullet(IAshooter):
         if self.rect.colliderect(obj):
             self.y = -100
             self.x = -100
-            return True
+            return "object"
         else:
             self.draw()
+            return "nothing"
 
 
 class Chest(IAshooter):
@@ -66,9 +67,9 @@ class Eyes(IAshooter):
     def collide(self, obj):
         self.rect = self.sprite.get_rect(topleft=[self.x, self.y])
         if self.rect.colliderect(obj):
-            return True
+            return "get_damage", 25
         else:
-            return False
+            return "nothing"
 
 
 
