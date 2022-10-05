@@ -304,7 +304,7 @@ def run():
     """filemusic.stop()"""
     pg.display.set_icon(icon)
     ship = Ship(r'C:\Users\franc\PycharmProjects\shoot\Assets\char1.png', 3)
-    list_enemies = [Eyes(screen, 600, 100), Xpbullet(screen, 200, -30), Xpbullet(screen, 400, -500),
+    list_enemies = [Eyes(screen, 600, 100), Vanguard(screen, 800, -10), Xpbullet(screen, 200, -30), Xpbullet(screen, 400, -500),
                     Eyes(screen, 100, 700), Eyes(screen, 100, -1000), Vanguard(screen, 20, 0)]
     count = 0
     while True:
