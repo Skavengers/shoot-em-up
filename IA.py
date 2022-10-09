@@ -81,7 +81,7 @@ class Vanguard(IAshooter):
         self.sprite_bullet.set_colorkey(WHITE)
     def draw(self):
         super(Vanguard, self).draw()
-        if self.y_bullet < -HEIGTH:
+        if self.y_bullet > -HEIGTH:
             self.y_bullet = self.y
             self.bullet()
         if self.charge == 0:
