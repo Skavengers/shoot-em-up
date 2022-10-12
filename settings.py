@@ -2,6 +2,7 @@ WHITE = (255,)*3
 BLACK = (100,)*3
 GREY  = (150,)*3
 RED   = (255, 0, 0)
+GOLD  = (255,215,0)
 WIDTH    = 1280
 HEIGTH   = 720
 FPS      = 80

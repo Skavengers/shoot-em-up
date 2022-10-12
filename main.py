@@ -1,7 +1,7 @@
 import random
 import pygame as pg
 from settings import *
-from IA import Xpbullet, Chest, Eyes, Vanguard
+from IA import Xpbullet, Chest, Eyes, Vanguard, Vessel
 
 
 class Ship:
@@ -75,11 +75,10 @@ class Ship:
             screen.blit(self.sprite, self.rect)
         """
 
-    def object(self):
-        self.animO()
-        self.lvl += 1
-        statement = self.font.render("CHOOSE YOUR ABILITY !", True, RED)
-        background = pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\nf.png").convert()
+    def get_chest(self):
+        self.object(True)
+
+    def object(self, is_chest=False):
         list_object = [["C:/Users/franc/PycharmProjects/shoot/Assets/objects/strong steel.png", "carac", "hp", 200],
                        ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/WingofHermes.png", "carac", "speed", 3],
                        ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/double-barrel.png", "special", "2shoot"],
@@ -89,62 +88,81 @@ class Ship:
                        [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\nothing.png", "special", ""],
                        [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\pow.png", "carac", "power", 1],
                        [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\shield.png", "carac", "hp", 500]]
-        random.shuffle(list_object)
-        img_object1 = pg.image.load(list_object[0][0])
-        img_object2 = pg.image.load(list_object[1][0])
-        img_object3 = pg.image.load(list_object[2][0])
-        choose = True
-        x = 590
-        count = 0
-        action = pg.time.get_ticks()
-        while choose:
-            count += 1
-            for event in pg.event.get():
-                if event.type == pg.QUIT:
-                    pg.quit()
-            keys = pg.key.get_pressed()
-            if keys[pg.K_LEFT] and pg.time.get_ticks() - 500 > action:
+        if not is_chest:
+            choice = 0
+            self.animO()
+            self.lvl += 1
+            statement = self.font.render("CHOOSE YOUR ABILITY !", True, RED)
+            background = pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\nf.png").convert()
+            random.shuffle(list_object)
+            img_object1 = pg.image.load(list_object[0][0])
+            img_object2 = pg.image.load(list_object[1][0])
+            img_object3 = pg.image.load(list_object[2][0])
+            choose = True
+            x = 590
+            count = 0
+            action = pg.time.get_ticks()
+            while choose:
+                count += 1
+                for event in pg.event.get():
+                    if event.type == pg.QUIT:
+                        pg.quit()
+                keys = pg.key.get_pressed()
+                if keys[pg.K_LEFT] and pg.time.get_ticks() - 500 > action:
+                    action = pg.time.get_ticks()
+                    if x == 1000:
+                        x = 590
+                    elif x == 190:
+                        x = 1000
+                    elif x == 590:
+                        x = 190
+                elif keys[pg.K_RIGHT] and pg.time.get_ticks() - 300 > action:
+                    action = pg.time.get_ticks()
+                    if x == 1000:
+                        x = 190
+                    elif x == 590:
+                        x = 1000
+                    else:
+                        x = 590
+                if keys[pg.K_e]:
+                    choose = False
+                    if x == 190:
+                        choice = 0
+                    if x == 590:
+                        choice = 1
+                    if x == 1000:
+                        choice = 2
+                    if list_object[choice][1] == "carac":
+                        if list_object[choice][2] == "hp":
+                            self.get_health(list_object[choice][3])
+                        if list_object[choice][2] == "speed" and self.speed < 20:
+                            self.speed += list_object[choice][3]
+                        if list_object[choice][2] == "power":
+                            self.power += list_object[choice][3]
+                        if list_object[choice][2] == "shoot_speed":
+                            self.shoot_speed += list_object[choice][3]
+                    if list_object[choice][1] == "special":
+                        if list_object[choice][2] == "2shoot":
+                            self.doublebarrel = True
+                screen.blit(background, (0, 0))
+                screen.blit(img_object1, (100, 150))
+                screen.blit(img_object2, (500, 150))
+                screen.blit(img_object3, (900, 150))
+                screen.blit(self.sprite, (x, 600))
+                screen.blit(statement, (WIDTH // 2, 50))
+            else:
+                value = 0
                 action = pg.time.get_ticks()
-                if x == 1000:
-                    x = 590
-                elif x == 190:
-                    x = 1000
-                elif x == 590:
-                    x = 190
-            elif keys[pg.K_RIGHT] and pg.time.get_ticks() - 300 > action:
-                action = pg.time.get_ticks()
-                if x == 1000:
-                    x = 190
-                elif x == 590:
-                    x = 1000
-                else:
-                    x = 590
-            if keys[pg.K_e]:
-                choose = False
-                if x == 190:
-                    choice = 0
-                if x == 590:
-                    choice = 1
-                if x == 1000:
-                    choice = 2
-                if list_object[choice][1] == "carac":
-                    if list_object[choice][2] == "hp":
-                        self.get_health(list_object[choice][3])
-                    if list_object[choice][2] == "speed" and self.speed < 20:
-                        self.speed += list_object[choice][3]
-                    if list_object[choice][2] == "power":
-                        self.power += list_object[choice][3]
-                    if list_object[choice][2] == "shoot_speed":
-                        self.shoot_speed += list_object[choice][3]
-                if list_object[choice][1] == "special":
-                    if list_object[choice][2] == "2shoot":
-                        self.doublebarrel = True
-            screen.blit(background, (0, 0))
-            screen.blit(img_object1, (100, 150))
-            screen.blit(img_object2, (500, 150))
-            screen.blit(img_object3, (900, 150))
-            screen.blit(self.sprite, (x, 600))
-            screen.blit(statement, (WIDTH // 2, 50))
+                while pg.time.get_ticks() + 35000 > action:
+                    for event in pg.event.get():
+                        if event.type == pg.QUIT:
+                            pg.quit()
+                    title = self.font.render("YOU GAIN ", True, RED)
+                    screen.blit(title, (400, 200))
+                    screen.blit(img_object1, (400, 400))
+                    value += 1
+                    clock.tick(FPS)
+                    pg.display.flip()
             pg.display.flip()
             clock.tick(FPS)
 
@@ -155,6 +173,8 @@ class Ship:
             self.get_damage(ufo[1])
         if ufo == "object":
             self.object()
+        if ufo == "chest":
+            self.get_chest()
 
     def die(self):
         """animation qui prend tout l’écran qui doit être plus petite pour ne pas impacter son coéquippier"""
@@ -304,8 +324,9 @@ def run():
     """filemusic.stop()"""
     pg.display.set_icon(icon)
     ship = Ship(r'C:\Users\franc\PycharmProjects\shoot\Assets\char1.png', 3)
-    list_enemies = [Eyes(screen, 600, 100), Vanguard(screen, 800, -10), Xpbullet(screen, 200, -30), Xpbullet(screen, 400, -500),
-                    Eyes(screen, 100, 700), Eyes(screen, 100, -1000), Vanguard(screen, 20, 0)]
+    list_enemies = [Eyes(screen, 600, 100), Vanguard(screen, 800, -10), Xpbullet(screen, 200, -30),
+                    Xpbullet(screen, 400, -500),
+                    Eyes(screen, 100, 700), Eyes(screen, 100, -1000), Vanguard(screen, 20, 0), Chest(screen)]
     count = 0
     while True:
         screen.blit(background, (0, 0))
