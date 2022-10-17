@@ -88,16 +88,16 @@ class Ship:
                        [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\nothing.png", "special", ""],
                        [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\pow.png", "carac", "power", 1],
                        [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\shield.png", "carac", "hp", 500]]
+        random.shuffle(list_object)
+        img_object1 = pg.image.load(list_object[0][0])
+        img_object2 = pg.image.load(list_object[1][0])
+        img_object3 = pg.image.load(list_object[2][0])
         if not is_chest:
             choice = 0
             self.animO()
             self.lvl += 1
             statement = self.font.render("CHOOSE YOUR ABILITY !", True, RED)
             background = pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\nf.png").convert()
-            random.shuffle(list_object)
-            img_object1 = pg.image.load(list_object[0][0])
-            img_object2 = pg.image.load(list_object[1][0])
-            img_object3 = pg.image.load(list_object[2][0])
             choose = True
             x = 590
             count = 0
@@ -124,7 +124,7 @@ class Ship:
                         x = 1000
                     else:
                         x = 590
-                if keys[pg.K_e]:
+                elif keys[pg.K_e]:
                     choose = False
                     if x == 190:
                         choice = 0
@@ -150,21 +150,21 @@ class Ship:
                 screen.blit(img_object3, (900, 150))
                 screen.blit(self.sprite, (x, 600))
                 screen.blit(statement, (WIDTH // 2, 50))
-            else:
-                value = 0
-                action = pg.time.get_ticks()
-                while pg.time.get_ticks() + 35000 > action:
-                    for event in pg.event.get():
-                        if event.type == pg.QUIT:
-                            pg.quit()
-                    title = self.font.render("YOU GAIN ", True, RED)
-                    screen.blit(title, (400, 200))
-                    screen.blit(img_object1, (400, 400))
-                    value += 1
-                    clock.tick(FPS)
-                    pg.display.flip()
-            pg.display.flip()
-            clock.tick(FPS)
+                pg.display.flip()
+                clock.tick(FPS)
+        else:
+            value = 0
+            action = pg.time.get_ticks()
+            while pg.time.get_ticks() + 35000 > action:
+                for event in pg.event.get():
+                    if event.type == pg.QUIT:
+                        pg.quit()
+                title = self.font.render("YOU GAIN ", True, RED)
+                screen.blit(title, (400, 200))
+                screen.blit(img_object1, (400, 400))
+                value += 1
+                clock.tick(FPS)
+                pg.display.flip()
 
     def collide(self, ufo):
         if ufo[0] == "get_health":
