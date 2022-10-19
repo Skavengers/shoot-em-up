@@ -11,10 +11,10 @@ class Ship:
         self.power = power
         self.sprite = pg.image.load(link_sprite).convert_alpha()
         self.true_sprite = pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\truesprite.png").convert_alpha()
-        self.true_rect = self.true_sprite.get_rect(topleft=[108, 113])
+        self.true_rect = self.true_sprite.get_rect(topleft=[258, 113])
         self.true_sprite.set_colorkey(WHITE)
         self.sprite.set_colorkey(WHITE)
-        self.rect = self.sprite.get_rect(topleft=[100, 100])
+        self.rect = self.sprite.get_rect(topleft=[250, 100])
         self.pos_shoot = []
         self.font = pg.font.Font("C:\\Users\\franc\\PycharmProjects\\shoot\\police\\neuropol\\neuropol.otf", 40)
         self.speed = 6

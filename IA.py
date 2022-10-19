@@ -39,7 +39,7 @@ class Xpbullet(IAshooter):
 
 class Chest(IAshooter):
     def __init__(self,screen):
-        super().__init__(random.randint(0,WIDTH), random.randint(0,HEIGTH),1,"C:/Users/franc/PycharmProjects/shoot/Assets/chest.png",screen)
+        super().__init__(random.randint(0,WIDTH), random.randint(0, HEIGTH),1, "C:/Users/franc/PycharmProjects/shoot/Assets/chest.png", screen)
         self.sprite = pg.transform.scale(self.sprite, (30, 30))
         self.rect = self.sprite.get_rect(topleft=[self.x, self.y])
     def draw(self):
@@ -75,27 +75,41 @@ class Vanguard(IAshooter):
     def __init__(self,screen,x,y):
         super(Vanguard, self).__init__(x,y,10,r"C:\Users\franc\PycharmProjects\shoot\Assets\mob\enemie.png",screen)
         self.sprite.set_colorkey(WHITE)
-        self.charge = 3
+        self.activate = True
         self.action = pg.time.get_ticks()
         self.y_bullet = self.y
-        self.sprite_bullet = pg.image.load(r'C:\Users\franc\PycharmProjects\shoot\Assets\animation\vanguardbullet\b1.png').convert_alpha()
-        self.sprite_bullet.set_colorkey(WHITE)
+        self.bullet_animation = [r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\vanguardbullet\b1.png",
+                                 r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\vanguardbullet\b2.png",
+                                 r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\vanguardbullet\b3.png",
+                                 r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\vanguardbullet\b4.png",
+                                 r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\vanguardbullet\b5.png",
+                                 r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\vanguardbullet\b6.png"]
+        for i in range(6):
+            self.bullet_animation[i] = pg.image.load(self.bullet_animation[i]).convert_alpha()
+            self.bullet_animation[i].set_colorkey(WHITE)
+
     def draw(self):
         super(Vanguard, self).draw()
-        if self.y_bullet > -HEIGTH:
-            self.y_bullet = self.y
-            self.bullet()
-        if self.charge == 0:
-            self.y -= 1
-        elif self.y < 100:
+        if self.activate and self.y != 100:
             self.y += 1
-        elif self.charge > 0 and pg.time.get_ticks() - 500 > self.action:
-            self.action = pg.time.get_ticks()
-            self.charge -= 1
+        if self.y == 100 and self.activate:
+            self.activate = False
+            self.y_bullet = self.y + 5
+            self.bullet()
+            action = pg.time.get_ticks()
+        if not self.activate and pg.time.get_ticks() - 2000 > self.action:
+            self.bullet()
+            self.y -= 1
+
+        #self.action = pg.time.get_ticks()
+        #elif self.activate == 0 and pg.time.get_ticks() - 500 > self.action:
+        #    self.y -= 1
+
     def bullet(self):
         shoot_speed = 1
-        self.y_bullet -= shoot_speed
-        self.screen.blit(self.sprite_bullet, (self.x, self.y_bullet))
+        self.y_bullet += shoot_speed
+        random.shuffle(self.bullet_animation)
+        self.screen.blit(self.bullet_animation[0], (self.x + 20, self.y_bullet))
 
     def collide(self,obj):
         self.rect = self.sprite.get_rect(topleft=[self.x, self.y])
