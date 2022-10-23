@@ -2,7 +2,7 @@ import random
 import pygame as pg
 from settings import *
 from IA import Xpbullet, Chest, Eyes, Vanguard, Vessel
-
+import os
 
 class Ship:
     def __init__(self, link_sprite, lvl=0, power=3):
@@ -10,7 +10,8 @@ class Ship:
         self.lvl = lvl
         self.power = power
         self.sprite = pg.image.load(link_sprite).convert_alpha()
-        self.true_sprite = pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\truesprite.png").convert_alpha()
+        print(os.path.join(os.getcwd(),"Assets","truesprite.png"))
+        self.true_sprite = pg.image.load(os.path.abspath("Assets/truesprite.png")).convert_alpha()
         self.true_rect = self.true_sprite.get_rect(topleft=[258, 113])
         self.true_sprite.set_colorkey(WHITE)
         self.sprite.set_colorkey(WHITE)
@@ -79,15 +80,14 @@ class Ship:
         self.object(True)
 
     def object(self, is_chest=False):
-        list_object = [["C:/Users/franc/PycharmProjects/shoot/Assets/objects/strong steel.png", "carac", "hp", 200],
-                       ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/WingofHermes.png", "carac", "speed", 3],
-                       ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/double-barrel.png", "special", "2shoot"],
-                       ["C:/Users/franc/PycharmProjects/shoot/Assets/objects/speedybullet.png", "carac", "shoot_speeb",
-                        10],
-                       [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\bomb.png", "special", ""],
-                       [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\nothing.png", "special", ""],
-                       [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\pow.png", "carac", "power", 1],
-                       [r"C:\Users\franc\PycharmProjects\shoot\Assets\objects\shield.png", "carac", "hp", 500]]
+        list_object = [[os.path.abspath("Assets/objects/strong steel.png"), "carac", "hp", 200],
+                       [os.path.abspath("Assets/objects/WingofHermes.png"), "carac", "speed", 3],
+                       [os.path.abspath("Assets/objects/double-barrel.png"), "special", "2shoot"],
+                       [os.path.abspath("Assets/objects/speedybullet.png"), "carac", "shoot_speeb", 10],
+                       [os.path.abspath("Assets/objects/bomb.png"), "special", ""],
+                       [os.path.abspath("Assets/objects/nothing.png"), "special", ""],
+                       [os.path.abspath("Assets/objects/pow.png"), "carac", "power", 1],
+                       [os.path.abspath("Assets/objects/shield.png"), "carac", "hp", 500]]
         random.shuffle(list_object)
         img_object1 = pg.image.load(list_object[0][0])
         img_object2 = pg.image.load(list_object[1][0])
@@ -154,14 +154,19 @@ class Ship:
                 clock.tick(FPS)
         else:
             value = 0
+            eee = True
             action = pg.time.get_ticks()
-            while pg.time.get_ticks() + 35000 > action:
+            while eee or pg.time.get_ticks() - 500 > action:
+                keys = pg.key.get_pressed()
                 for event in pg.event.get():
                     if event.type == pg.QUIT:
                         pg.quit()
+                if keys[pg.K_b]:
+                    eee = False
+
                 title = self.font.render("YOU GAIN ", True, RED)
                 screen.blit(title, (400, 200))
-                screen.blit(img_object1, (400, 400))
+                screen.blit(img_object1, (500, 150))
                 value += 1
                 clock.tick(FPS)
                 pg.display.flip()

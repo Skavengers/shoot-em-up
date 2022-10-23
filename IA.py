@@ -96,7 +96,7 @@ class Vanguard(IAshooter):
             self.activate = False
             self.y_bullet = self.y + 5
             self.bullet()
-            action = pg.time.get_ticks()
+            self.action = pg.time.get_ticks()
         if not self.activate and pg.time.get_ticks() - 2000 > self.action:
             self.bullet()
             self.y -= 1
@@ -111,12 +111,16 @@ class Vanguard(IAshooter):
         random.shuffle(self.bullet_animation)
         self.screen.blit(self.bullet_animation[0], (self.x + 20, self.y_bullet))
 
-    def collide(self,obj):
+    def collide(self, obj):
         self.rect = self.sprite.get_rect(topleft=[self.x, self.y])
+        b_rect = pg.Rect(self.x+45, self.y_bullet+30, 10, 10)
         if self.rect.colliderect(obj):
             self.x = 0
             self.y = 2000
-            return "get_damage", 100
+            return "get_damage", 400
+        elif b_rect.colliderect(obj):
+            self.y_bullet = 1000
+            return "get_damage", 200
         else:
             return "nothing"
 
