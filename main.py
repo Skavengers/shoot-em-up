@@ -17,6 +17,7 @@ class Ship:
         self.sprite.set_colorkey(WHITE)
         self.rect = self.sprite.get_rect(topleft=[250, 100])
         self.pos_shoot = []
+        self.l_rect_missile = []
         self.font = pg.font.Font("C:\\Users\\franc\\PycharmProjects\\shoot\\police\\neuropol\\neuropol.otf", 40)
         self.speed = 6
         self.oldspeed = self.speed
@@ -344,7 +345,7 @@ def run():
         ship.laser()
         for en in list_enemies:
             en.draw()
-            ship.collide(en.collide(ship.rect))
+            ship.collide(en.collide(ship.rect, ship.l_rect_missile))
         if ship.current_health == 0:
             ship.die()
         ship.draw()

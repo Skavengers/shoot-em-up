@@ -26,7 +26,7 @@ class Xpbullet(IAshooter):
         if self.y > 720:
             self.x = random.randint(0, HEIGTH)
             self.y = 100"""
-    def collide(self,obj):
+    def collide(self,obj,n):
         self.rect = self.sprite.get_rect(topleft=[self.x, self.y])
         if self.rect.colliderect(obj):
             self.y = -100
@@ -44,7 +44,7 @@ class Chest(IAshooter):
         self.rect = self.sprite.get_rect(topleft=[self.x, self.y])
     def draw(self):
         self.screen.blit(self.sprite, (self.x, self.y))
-    def collide(self, obj):
+    def collide(self, obj,n):
         self.rect = self.sprite.get_rect(topleft=[self.x, self.y])
         if self.rect.colliderect(obj):
             self.y = -100
@@ -63,7 +63,7 @@ class Eyes(IAshooter):
         self.x += random.randint(-2,2)
         self.y += 1
         super(Eyes, self).draw()
-    def collide(self, obj):
+    def collide(self, obj,n):
         self.rect = self.sprite.get_rect(topleft=[self.x, self.y])
         if self.rect.colliderect(obj):
             return "get_damage", 25
@@ -111,7 +111,7 @@ class Vanguard(IAshooter):
         random.shuffle(self.bullet_animation)
         self.screen.blit(self.bullet_animation[0], (self.x + 20, self.y_bullet))
 
-    def collide(self, obj):
+    def collide(self, obj,l_rect_missile):
         self.rect = self.sprite.get_rect(topleft=[self.x, self.y])
         b_rect = pg.Rect(self.x+45, self.y_bullet+30, 10, 10)
         if self.rect.colliderect(obj):
@@ -122,6 +122,10 @@ class Vanguard(IAshooter):
             self.y_bullet = 1000
             return "get_damage", 200
         else:
+            for i in l_rect_missile:
+                if self.rect.colliderect(i):
+                    self.y = 1000
+
             return "nothing"
 
 
@@ -134,7 +138,7 @@ class Vessel(IAshooter):
     def draw(self):
         super(Vessel, self).draw()
         self.x -= self.k
-    def collide(self,obj):
+    def collide(self,obj,n):
         self.rect = self.sprite.get_rect(topleft=[self.x, self.y])
         if self.rect.colliderect(obj):
             self.x = 0
