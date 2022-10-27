@@ -39,7 +39,7 @@ class Xpbullet(IAshooter):
 
 class Chest(IAshooter):
     def __init__(self,screen):
-        super().__init__(random.randint(0,WIDTH), random.randint(0, HEIGTH),1, "C:/Users/franc/PycharmProjects/shoot/Assets/chest.png", screen)
+        super().__init__(random.randint(0,WIDTH), random.randint(0, HEIGTH), 1, "C:/Users/franc/PycharmProjects/shoot/Assets/chest.png", screen)
         self.sprite = pg.transform.scale(self.sprite, (30, 30))
         self.rect = self.sprite.get_rect(topleft=[self.x, self.y])
     def draw(self):
@@ -57,23 +57,29 @@ class Chest(IAshooter):
 
 class Eyes(IAshooter):
     def __init__(self,screen,x,y):
-        super().__init__(x,y,1,"C:/Users/franc/PycharmProjects/shoot/Assets/mob/yeux.jpg",screen)
+        super().__init__(x,y,100,"C:/Users/franc/PycharmProjects/shoot/Assets/mob/yeux.jpg",screen)
         self.sprite.set_colorkey(WHITE)
     def draw(self):
         self.x += random.randint(-2,2)
         self.y += 1
         super(Eyes, self).draw()
-    def collide(self, obj,n):
+    def collide(self, obj,m):
         self.rect = self.sprite.get_rect(topleft=[self.x, self.y])
         if self.rect.colliderect(obj):
             return "get_damage", 25
         else:
+            j = 0
+            for i in m:
+                j += 1
+                if self.rect.colliderect(i):
+                    self.health -= 10
+                    return "supp missile", j - 1
             return "nothing"
 
 
 class Vanguard(IAshooter):
     def __init__(self,screen,x,y):
-        super(Vanguard, self).__init__(x,y,10,r"C:\Users\franc\PycharmProjects\shoot\Assets\mob\enemie.png",screen)
+        super(Vanguard, self).__init__(x,y,300,r"C:\Users\franc\PycharmProjects\shoot\Assets\mob\enemie.png",screen)
         self.sprite.set_colorkey(WHITE)
         self.activate = True
         self.action = pg.time.get_ticks()
@@ -111,7 +117,7 @@ class Vanguard(IAshooter):
         random.shuffle(self.bullet_animation)
         self.screen.blit(self.bullet_animation[0], (self.x + 20, self.y_bullet))
 
-    def collide(self, obj,l_rect_missile):
+    def collide(self, obj, l_rect_missile):
         self.rect = self.sprite.get_rect(topleft=[self.x, self.y])
         b_rect = pg.Rect(self.x+45, self.y_bullet+30, 10, 10)
         if self.rect.colliderect(obj):
@@ -124,7 +130,7 @@ class Vanguard(IAshooter):
         else:
             for i in l_rect_missile:
                 if self.rect.colliderect(i):
-                    self.y = 1000
+                    self.health -= 10
 
             return "nothing"
 

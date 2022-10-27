@@ -6,6 +6,7 @@ import os
 
 class Ship:
     def __init__(self, link_sprite, lvl=0, power=3):
+        self.missile_dommage = 10
         self.time_laser = 0
         self.lvl = lvl
         self.power = power
@@ -18,7 +19,7 @@ class Ship:
         self.rect = self.sprite.get_rect(topleft=[250, 100])
         self.pos_shoot = []
         self.l_rect_missile = []
-        self.font = pg.font.Font("C:\\Users\\franc\\PycharmProjects\\shoot\\police\\neuropol\\neuropol.otf", 40)
+        self.font = pg.font.Font(os.path.abspath("police\\neuropol\\neuropol.otf"), 40)
         self.speed = 6
         self.oldspeed = self.speed
         self.shoot_speed = 10
@@ -98,7 +99,7 @@ class Ship:
             self.animO()
             self.lvl += 1
             statement = self.font.render("CHOOSE YOUR ABILITY !", True, RED)
-            background = pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\nf.png").convert()
+            background = pg.image.load(os.path.abspath(r"Assets\animation\objectroom\nf.png")).convert()
             choose = True
             x = 590
             count = 0
@@ -185,9 +186,9 @@ class Ship:
     def die(self):
         """animation qui prend tout l’écran qui doit être plus petite pour ne pas impacter son coéquippier"""
         die_animation_list = [
-            pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\die\animation.png").convert(),
-            pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\die\animation2.png").convert(),
-            pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\die\animation3.png").convert()]
+            pg.image.load(os.path.abspath(r"Assets\animation\die\animation.png")).convert(),
+            pg.image.load(os.path.abspath(r"Assets\animation\die\animation2.png")).convert(),
+            pg.image.load(os.path.abspath(r"Assets\animation\die\animation3.png")).convert()]
         value = 0
         walk = True
         while walk:
@@ -253,11 +254,13 @@ class Ship:
             value += 1
 
     def bullet(self):
-        sprite_bullet = pg.image.load(r'C:\Users\franc\PycharmProjects\shoot\Assets\shoot.png').convert_alpha()
+        sprite_bullet = pg.image.load(os.path.abspath(r'Assets\shoot.png')).convert_alpha()
         sprite_bullet.set_colorkey(WHITE)
         compteur = 0
+        self.l_rect_missile = []
         for i in range(len(self.pos_shoot)):
             i -= compteur
+            self.l_rect_missile.append(sprite_bullet.get_rect(topleft=self.pos_shoot[i]))
             if len(self.pos_shoot) != 0:
                 self.pos_shoot[i][1] -= int(self.shoot_speed)
                 screen.blit(sprite_bullet, (
@@ -280,15 +283,15 @@ class Ship:
         if self.time_laser == 6:
             self.speed = 1
         laser_animation = [
-            pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\laser\laser.png").convert_alpha(),
-            pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\laser\laser1.png").convert_alpha(),
-            pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\laser\laser2A.png").convert_alpha(),
-            pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\laser\laser2B.png").convert_alpha(),
-            pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\laser\laser3.png").convert_alpha(),
-            pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\laser\laser4.png").convert_alpha(),
-            pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\laser\laser5.png").convert_alpha(),
-            pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\laser\laser7.png").convert_alpha(),
-            pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\laser\laser8.png").convert_alpha()]
+            pg.image.load(os.path.abspath(r"Assets\animation\laser\laser.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\laser\laser1.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\laser\laser2A.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\laser\laser2B.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\laser\laser3.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\laser\laser4.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\laser\laser5.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\laser\laser7.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\laser\laser8.png")).convert_alpha()]
         int_time_run = int(self.time_laser)
 
         try:
@@ -322,14 +325,14 @@ class Ship:
 
 def run():
     pg.display.set_caption('to the moon')
-    icon = pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\pycon.png").convert()
-    background = pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\background.jpg").convert()
-    filemusic = pg.mixer.Sound("C:\\Users\\franc\\PycharmProjects\\shoot\\Assets\\Sound\\music\\BlueBoi.ogg")
+    icon = pg.image.load(os.path.abspath(r"Assets\pycon.png")).convert()
+    background = pg.image.load(os.path.abspath(r"Assets\background.jpg")).convert()
+    filemusic = pg.mixer.Sound(os.path.abspath("Assets\\Sound\\music\\BlueBoi.ogg"))
     filemusic.play()
     filemusic.stop()
     """filemusic.stop()"""
     pg.display.set_icon(icon)
-    ship = Ship(r'C:\Users\franc\PycharmProjects\shoot\Assets\char1.png', 3)
+    ship = Ship(os.path.abspath(r'Assets\char1.png'), 3)
     list_enemies = [Eyes(screen, 600, 100), Vanguard(screen, 800, -10), Xpbullet(screen, 200, -30),
                     Xpbullet(screen, 400, -500),
                     Eyes(screen, 100, 700), Eyes(screen, 100, -1000), Vanguard(screen, 20, 0), Chest(screen)]
@@ -343,9 +346,13 @@ def run():
         ship.keys(count)
         ship.bullet()
         ship.laser()
+        i = 0
         for en in list_enemies:
+            i += 1
             en.draw()
             ship.collide(en.collide(ship.rect, ship.l_rect_missile))
+            if en.health < 0 or en.y < -HEIGTH:
+                del list_enemies[i-1]
         if ship.current_health == 0:
             ship.die()
         ship.draw()
