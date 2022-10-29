@@ -364,6 +364,6 @@ if __name__ == '__main__':
     screen = pg.display.set_mode((WIDTH, HEIGTH))
     pg.init()
     pg.mixer.init()
-    pg.mouse.set_visible(False)
+    pg.mouse.set_visible(True)
     clock = pg.time.Clock()
     run()

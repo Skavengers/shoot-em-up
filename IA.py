@@ -13,6 +13,17 @@ class IAshooter:
     def draw(self):
         self.rect = self.sprite.get_rect(topleft=[self.x, self.y])
         self.screen.blit(self.sprite,(self.x,self.y))
+    def collide(self,obj,m):
+        self.rect = self.sprite.get_rect(topleft=[self.x, self.y])
+        if self.rect.colliderect(obj):
+            self.x = 0
+            self.y = 2000
+            return "get_damage", 400
+        else:
+            for i in m:
+                if self.rect.colliderect(i):
+                    self.health -= 10
+            return "nothing"
 
 
 class Xpbullet(IAshooter):
@@ -152,8 +163,21 @@ class Vessel(IAshooter):
             return "get_damage", 50
         else:
             return "nothing"
-
-
+class Bird(IAshooter):
+    def __init__(self,x,y,screen,x1,y1):
+        super(Bird, self).__init__(x, y, 300, r"C:\Users\franc\PycharmProjects\shoot\Assets\mob\enemie.png", screen)
+        self.sprite.set_colorkey(WHITE)
+        self.activate = True
+        self.action = pg.time.get_ticks()
+        self.y1 = y1
+        self.x1 = x1
+    def draw(self):
+        pass
+    def colllide(self,obj,m):
+        pass
+class Boss:
+    def __init__(self):
+        pass
 
 
 
