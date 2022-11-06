@@ -84,7 +84,6 @@ class Eyes(IAshooter):
                 j += 1
                 if self.rect.colliderect(i):
                     self.health -= 10
-                    return "supp missile", j - 1
             return "nothing"
 
 
@@ -164,13 +163,13 @@ class Vessel(IAshooter):
         else:
             return "nothing"
 class Bird(IAshooter):
-    def __init__(self,x,y,screen,x1,y1):
+    def __init__(self,x,y,screen,player_rect):
         super(Bird, self).__init__(x, y, 300, r"C:\Users\franc\PycharmProjects\shoot\Assets\mob\enemie.png", screen)
         self.sprite.set_colorkey(WHITE)
         self.activate = True
         self.action = pg.time.get_ticks()
-        self.y1 = y1
-        self.x1 = x1
+        self.v = pg.math.Vector2()
+        self.v = "e"
     def draw(self):
         pass
     def colllide(self,obj,m):

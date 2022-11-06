@@ -10,21 +10,22 @@ class Ship:
         self.time_laser = 0
         self.lvl = lvl
         self.power = power
+        self.pace = 2
         self.sprite = pg.image.load(link_sprite).convert_alpha()
-        print(os.path.join(os.getcwd(),"Assets","truesprite.png"))
         self.true_sprite = pg.image.load(os.path.abspath("Assets/truesprite.png")).convert_alpha()
         self.true_rect = self.true_sprite.get_rect(topleft=[258, 113])
         self.true_sprite.set_colorkey(WHITE)
         self.sprite.set_colorkey(WHITE)
         self.rect = self.sprite.get_rect(topleft=[250, 100])
         self.pos_shoot = []
+        self.pos_shootb = []
         self.l_rect_missile = []
         self.font = pg.font.Font(os.path.abspath("police\\neuropol\\neuropol.otf"), 40)
         self.speed = 6
         self.oldspeed = self.speed
         self.shoot_speed = 10
         self.doublebarrel = False
-
+        self.l_rect_missileb =[]
         self.target_health = 500
         self.current_health = 200
         self.max_health = 1000
@@ -80,16 +81,18 @@ class Ship:
 
     def get_chest(self):
         self.object(True)
-
+    def get_bomb(self):
+        pass
     def object(self, is_chest=False):
         list_object = [[os.path.abspath("Assets/objects/strong steel.png"), "carac", "hp", 200],
                        [os.path.abspath("Assets/objects/WingofHermes.png"), "carac", "speed", 3],
                        [os.path.abspath("Assets/objects/double-barrel.png"), "special", "2shoot"],
                        [os.path.abspath("Assets/objects/speedybullet.png"), "carac", "shoot_speeb", 10],
-                       [os.path.abspath("Assets/objects/bomb.png"), "special", ""],
+                       [os.path.abspath("Assets/objects/bomb.png"), "special", "bomb",""],
                        [os.path.abspath("Assets/objects/nothing.png"), "special", ""],
                        [os.path.abspath("Assets/objects/pow.png"), "carac", "power", 1],
-                       [os.path.abspath("Assets/objects/shield.png"), "carac", "hp", 500]]
+                       [os.path.abspath("Assets/objects/shield.png"), "carac", "hp", 500],
+                       [os.path.abspath("Assets/objects/hshot.png"), "special","hshot",""]]
         random.shuffle(list_object)
         img_object1 = pg.image.load(list_object[0][0])
         img_object2 = pg.image.load(list_object[1][0])
@@ -141,11 +144,16 @@ class Ship:
                             self.speed += list_object[choice][3]
                         if list_object[choice][2] == "power":
                             self.power += list_object[choice][3]
-                        if list_object[choice][2] == "shoot_speed":
-                            self.shoot_speed += list_object[choice][3]
+                        if list_object[choice][2] == "shoot_speed" and self.pace >= 3:
+                            self.pace += 1
+                            #self.shoot_speed += list_object[choice][3]
                     if list_object[choice][1] == "special":
                         if list_object[choice][2] == "2shoot":
                             self.doublebarrel = True
+                        if list_object[choice][2] == "hshot":
+                            self.get_bottom_shot()
+                        if list_object[choice][2] == "bomb":
+                            self.get_bottom_shot()
                 screen.blit(background, (0, 0))
                 screen.blit(img_object1, (100, 150))
                 screen.blit(img_object2, (500, 150))
@@ -183,6 +191,43 @@ class Ship:
         if ufo == "chest":
             self.get_chest()
 
+    def get_bottom_shot(self):
+        sprite_bullet = pg.image.load(os.path.abspath(r'Assets\upponscreen\bomb.png')).convert_alpha()
+        sprite_bullet.set_colorkey(WHITE)
+        compteur = 0
+        self.l_rect_missileb = []
+        for i in range(len(self.pos_shootb)):
+            i -= compteur
+            self.l_rect_missileb.append(sprite_bullet.get_rect(topleft=self.pos_shootb[i]))
+            if len(self.pos_shootb) != 0:
+                self.pos_shootb[i][1] += 1
+                screen.blit(sprite_bullet, (self.pos_shootb[i][0] + sprite_bullet.get_width() / 2-3, self.pos_shootb[i][1]+self.sprite.get_height()))
+                print(self.pos_shootb)
+                if self.pos_shootb[i][1] > HEIGTH:
+                    del self.pos_shootb[i]
+                    compteur += 1
+
+    def bullet(self):
+        self.get_bottom_shot()
+        sprite_bullet = pg.image.load(os.path.abspath(r'Assets\shoot.png')).convert_alpha()
+        sprite_bullet.set_colorkey(WHITE)
+        compteur = 0
+        self.l_rect_missile = []
+        for i in range(len(self.pos_shoot)):
+            i -= compteur
+            self.l_rect_missile.append(sprite_bullet.get_rect(topleft=self.pos_shoot[i]))
+            if len(self.pos_shoot) != 0:
+                self.pos_shoot[i][1] -= int(self.shoot_speed)
+                screen.blit(sprite_bullet, (
+                    self.pos_shoot[i][0] + sprite_bullet.get_width() / 2 - 4 if self.doublebarrel == False else
+                    self.pos_shoot[i][0] + sprite_bullet.get_width() / 2 - 9, self.pos_shoot[i][1]))
+                if self.doublebarrel:
+                    screen.blit(sprite_bullet,
+                                (self.pos_shoot[i][0] + sprite_bullet.get_width() / 2 + 2, self.pos_shoot[i][1]))
+                if self.pos_shoot[i][1] < 0:
+                    del self.pos_shoot[i]
+                    compteur += 1
+
     def die(self):
         """animation qui prend tout l’écran qui doit être plus petite pour ne pas impacter son coéquippier"""
         die_animation_list = [
@@ -203,43 +248,26 @@ class Ship:
     def animO(self):
         """animation qui prend tout l’écran utiliser pour choisir la carte que l’on veut"""
         animation_list = [
-            pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n1.png").convert_alpha(),
-            pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n2.png").convert_alpha(),
-            pg.image.load(r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n3.png").convert_alpha(),
-            pg.image.load(
-                r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n4png.png").convert_alpha(),
-            pg.image.load(
-                r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n5png.png").convert_alpha(),
-            pg.image.load(
-                r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n6png.png").convert_alpha(),
-            pg.image.load(
-                r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n7png.png").convert_alpha(),
-            pg.image.load(
-                r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n8png.png").convert_alpha(),
-            pg.image.load(
-                r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n9png.png").convert_alpha(),
-            pg.image.load(
-                r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n10png.png").convert_alpha(),
-            pg.image.load(
-                r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n11png.png").convert_alpha(),
-            pg.image.load(
-                r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n12png.png").convert_alpha(),
-            pg.image.load(
-                r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n13png.png").convert_alpha(),
-            pg.image.load(
-                r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n14png.png").convert_alpha(),
-            pg.image.load(
-                r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n15png.png").convert_alpha(),
-            pg.image.load(
-                r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n16png.png").convert_alpha(),
-            pg.image.load(
-                r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n17png.png").convert_alpha(),
-            pg.image.load(
-                r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n18png.png").convert_alpha(),
-            pg.image.load(
-                r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n19png.png").convert_alpha(),
-            pg.image.load(
-                r"C:\Users\franc\PycharmProjects\shoot\Assets\animation\objectroom\n19png.png").convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\objectroom\n1.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\objectroom\n2.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\objectroom\n3.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\objectroom\n4png.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\objectroom\n5png.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\objectroom\n6png.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\objectroom\n7png.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\objectroom\n8png.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\objectroom\n9png.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\objectroom\n10png.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\objectroom\n11png.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\objectroom\n12png.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\objectroom\n13png.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\objectroom\n14png.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\objectroom\n15png.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\objectroom\n16png.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\objectroom\n17png.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\objectroom\n18png.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\objectroom\n19png.png")).convert_alpha(),
+            pg.image.load(os.path.abspath(r"Assets\animation\objectroom\n19png.png")).convert_alpha(),
         ]
         value = 0
         walk = True
@@ -253,25 +281,6 @@ class Ship:
             clock.tick(20)
             value += 1
 
-    def bullet(self):
-        sprite_bullet = pg.image.load(os.path.abspath(r'Assets\shoot.png')).convert_alpha()
-        sprite_bullet.set_colorkey(WHITE)
-        compteur = 0
-        self.l_rect_missile = []
-        for i in range(len(self.pos_shoot)):
-            i -= compteur
-            self.l_rect_missile.append(sprite_bullet.get_rect(topleft=self.pos_shoot[i]))
-            if len(self.pos_shoot) != 0:
-                self.pos_shoot[i][1] -= int(self.shoot_speed)
-                screen.blit(sprite_bullet, (
-                    self.pos_shoot[i][0] + sprite_bullet.get_width() / 2 - 4 if self.doublebarrel == False else
-                    self.pos_shoot[i][0] + sprite_bullet.get_width() / 2 - 9, self.pos_shoot[i][1]))
-                if self.doublebarrel:
-                    screen.blit(sprite_bullet,
-                                (self.pos_shoot[i][0] + sprite_bullet.get_width() / 2 + 2, self.pos_shoot[i][1]))
-                if self.pos_shoot[i][1] < 0:
-                    del self.pos_shoot[i]
-                    compteur += 1
 
     def uselaser(self):
         self.time_laser = 6
@@ -317,11 +326,11 @@ class Ship:
         if keys[pg.K_DOWN] and self.rect.y < HEIGTH - SIZE_h:
             self.rect.bottom += self.speed
             self.true_rect.bottom += self.speed
-        if keys[pg.K_b] and count % (FPS / 4) == 0 and not self.laser():
+        if keys[pg.K_b] and count % (FPS / self.pace) == 0 and not self.laser():
             self.pos_shoot.append([self.rect.x, self.rect.y])
+            self.pos_shootb.append([self.rect.x, self.rect.y])
         if keys[pg.K_a] and not self.laser() and self.power != 0:
             self.uselaser()
-
 
 def run():
     pg.display.set_caption('to the moon')
@@ -333,9 +342,9 @@ def run():
     """filemusic.stop()"""
     pg.display.set_icon(icon)
     ship = Ship(os.path.abspath(r'Assets\char1.png'), 3)
-    list_enemies = [Eyes(screen, 600, 100), Vanguard(screen, 800, -10), Xpbullet(screen, 200, -30),
-                    Xpbullet(screen, 400, -500),
-                    Eyes(screen, 100, 700), Eyes(screen, 100, -1000), Vanguard(screen, 20, 0), Chest(screen)]
+    list_enemies = [Eyes(screen, 600, -100), Vanguard(screen, 800, -10), Xpbullet(screen, 200, -1030),
+                    Xpbullet(screen, 200, -30), Xpbullet(screen, 400, -500), Vanguard(screen, 300, -300),
+                    Eyes(screen, 100, -700), Eyes(screen, 100, -1000), Vanguard(screen, 20, 0)]
     count = 0
     while True:
         screen.blit(background, (0, 0))
@@ -344,6 +353,7 @@ def run():
             if event.type == pg.QUIT:
                 pg.quit()
         ship.keys(count)
+        ship.get_bottom_shot()
         ship.bullet()
         ship.laser()
         i = 0
